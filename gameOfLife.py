@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from random import randint
+import time
 
 # 1. initialisation du tableau
 # 	=> RANDOM
@@ -38,36 +39,66 @@ def getCellCloseEnvironment(i,j,world):
 	environment = getEmptyGrill(CLOSE_ENVIRONMENT_SIZE)
 
 	for x in range(CLOSE_ENVIRONMENT_SIZE):
-		i = x - int(CLOSE_ENVIRONMENT_SIZE/2)
+		i = i- x - int(CLOSE_ENVIRONMENT_SIZE/2)
 		for y in range(CLOSE_ENVIRONMENT_SIZE):
-			j = y - int(CLOSE_ENVIRONMENT_SIZE/2)
+			j = j - y - int(CLOSE_ENVIRONMENT_SIZE/2)
 			environment[x][y] = world[i][j]
 
 	return environment
 
 # l'environnement représente la grille d'étude autour de la cellule analysée
-def liveDieRebornDecision(environment): 
-	print "coucou"
+# 	state: état de la cellule analysée
+# 	neighborCounter: nb de voisins, obtenu avec la fonction neighborCounter()
+def liveDieRebornDecision(state, nbNeighbor): 
+	newState = 0
+	if state == 0 and nbNeighbor == 3:
+		newState = 1
+	elif state == 1 and (nbNeighbor == 2 or nbNeighbor == 3): 
+		newState = 1
 
-def processNewGeneration(oldGrill):
-	for i in range(len(oldGrill)):
-		for j in range(oldGrill):
-			print "coucou"
+	return newState
+
+# def processNewGeneration(oldGrill):
+# 	for i in range(len(oldGrill)):
+# 		for j in range(oldGrill):
+# 			print "coucou"
+
+def neighborCounter(closeEnvironment):
+	# la cellule analysée est au milieu de la cellule
+	index = int(len(closeEnvironment[1])/2)
+	counter = 0
+
+	for i in range(len(closeEnvironment)):
+		for j in range(len(closeEnvironment)):
+			if not(i == index and j == index):
+				counter += closeEnvironment[i][j]
+
+	return counter
+
+
 
 def main():
 	global NB_OCCURENCES
 	global CLOSE_ENVIRONMENT_SIZE
 
-	grill = getEmptyGrill(50) 
-	randomInitialisation(grill)
-	#print "grill: " +str(grill)
-	printGrill(grill)
-	#for i in range(NB_OCCURENCES):
-	#	processNewGeneration(grill)
+	world = getEmptyGrill(20)
+	newWorld = getEmptyGrill(20)
 
-	closeGrill = getCellCloseEnvironment(0,0,grill)
-	printGrill(closeGrill)
+	randomInitialisation(world)
+	printGrill(world)
 
+	for index in range(5):
+		for i in range(len(world)):
+			for j in range(len(world)):
+				closeEnvironment = getCellCloseEnvironment(i,j,world)
+				nbNeighbor = neighborCounter(closeEnvironment)
+				newState = liveDieRebornDecision(world[i][j], nbNeighbor)
+				newWorld[i][j] = newState
+		world = newWorld
+		newWorld = getEmptyGrill(20)
+
+		print "\n****************************************\n"
+		printGrill(world)
 
 if __name__ == "__main__":
     main()
